@@ -846,9 +846,14 @@ bool Node::hasSideEffects() const {
     case prim::SetAttr:
     case aten::warn:
     case prim::AddStatValue:
-     case prim::TimePoint:
+    case prim::TimePoint:
       return true;
   }
+  // Custom ops may have arbitrary side effects
+  if (!kind_.is_builtin_ns()) {
+    return true;
+  }
+
   return false;
 }
 

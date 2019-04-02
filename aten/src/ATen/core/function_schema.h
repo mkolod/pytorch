@@ -146,12 +146,17 @@ public:
     return is_varret_;
   }
   bool is_mutable() const {
-    return std::any_of(
-        arguments_.cbegin(), arguments_.cend(), [](const Argument& arg) {
-          const auto& aliasInfo = arg.alias_info();
-          return aliasInfo && aliasInfo.value().isWrite();
-        });
+    return is_custom_op() ||
+        std::any_of(
+            arguments_.cbegin(), arguments_.cend(), [](const Argument& arg) {
+              const auto& aliasInfo = arg.alias_info();
+              return aliasInfo && aliasInfo.value().isWrite();
+            });
   }
+  bool is_custom_op() const {
+    return !Symbol::fromQualString(name_).is_builtin_ns();
+  }
+
   c10::optional<int> argumentIndexWithName(const std::string& name) const {
     for(size_t i = 0; i < arguments().size(); ++i) {
       if(name == arguments()[i].name())
